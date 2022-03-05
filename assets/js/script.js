@@ -13,8 +13,10 @@ for (let i = 9; i <= 17; i++) {
     hourEl.text((i-12) + "PM");
   }
   
-  let textEl = $("<textarea>").addClass("col-10")
-  let saveEl = $("<button>").addClass("col-1 saveBtn");
+  let textEl = $("<textarea>").addClass("col-10 textArea")
+  let saveEl = $("<button>")
+    .addClass("col-1 saveBtn")
+    .html('<i class="fa-solid fa-floppy-disk"></i>');
   let hourRowEl = $("#hour-" + i);
   hourRowEl.append(hourEl, textEl, saveEl);
 }
@@ -27,7 +29,7 @@ let checkTime = function(timeEl) {
   time = moment(time, "LT").set("minute", 0);
 
   // add a moment time to check current hour
-  let withinHour = moment(time, "LT").add(59, "minute")
+  let withinHour = moment(time, "LT").add(59, "minutes").add(59, "seconds");
   
   // remove any old classes from element
   $(timeEl).removeClass("past present future");
