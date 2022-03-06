@@ -1,3 +1,4 @@
+let events = {};
 let todayEl = $("#currentDay").text(moment().format("dddd, MMMM Do"));
 
 for (let i = 9; i <= 17; i++) {
@@ -13,13 +14,35 @@ for (let i = 9; i <= 17; i++) {
     hourEl.text((i-12) + "PM");
   }
   
-  let textEl = $("<textarea>").addClass("col-10 textArea")
+  let textEl = $("<textarea>").addClass("col-10 text-area")
   let saveEl = $("<button>")
     .addClass("col-1 saveBtn")
     .html('<i class="fa-solid fa-floppy-disk"></i>');
   let hourRowEl = $("#hour-" + i);
   hourRowEl.append(hourEl, textEl, saveEl);
 }
+
+let saveEvents = function() {
+  localStorage.setItem("events", JSON.stringify(events));
+}
+
+$(".time-block").on("click", "button", function() {
+  let text = $(this)
+    .prev("textarea")
+    .val();
+
+  let hourRow = $(this)
+    .closest(".time-block")
+    .attr("id")
+    .replace("#", "");
+
+  events = {
+    hour: hourRow,
+    text: text
+  };
+
+  saveEvents();
+})
 
 let checkTime = function(timeEl) {
   // get time from hour element
