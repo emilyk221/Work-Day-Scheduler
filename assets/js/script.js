@@ -1,4 +1,4 @@
-let events = [];
+let appts = [];
 
 // dispaly current day in the header
 let todayEl = $("#currentDay").text(moment().format("dddd, MMMM Do"));
@@ -27,16 +27,15 @@ for (let i = 9; i <= 17; i++) {
 
 // load appointments from localStorage
 let loadEvents = function() {
-  let events = JSON.parse(localStorage.getItem("events"));
-  if (!events) {
-    events = [];
-    //return false;
+  appts = JSON.parse(localStorage.getItem("appts"));
+  if (!appts) {
+    return false;
   }
 
-  // get hour and text value from each object in events array
-  for (let i = 0; i < events.length; i++) {
-    let hour = events[i].hour;
-    let text = events[i].text;
+  // get hour and text value from each object in appts array
+  for (let i = 0; i < appts.length; i++) {
+    let hour = appts[i].hour;
+    let text = appts[i].text;
 
     // change text in textarea to stored value in corresponding time-block row
     $("#hour-" + hour)
@@ -45,9 +44,9 @@ let loadEvents = function() {
   }
 }
 
-// save event appointments to local storage
+// save appointments to local storage
 let saveEvents = function() {
-  localStorage.setItem("events", JSON.stringify(events));
+  localStorage.setItem("appts", JSON.stringify(appts));
 }
 
 // hide notification of appointment saved
@@ -60,7 +59,7 @@ let clearNotify = function() {
 // when save button is clicked, get text from textarea and corresponding hour to put into localStorage
 $(".time-block").on("click", "button", function() {
   // get value of text from textarea
-  let text = $(this)
+  let newText = $(this)
     .prev("textarea")
     .val();
 
@@ -70,15 +69,42 @@ $(".time-block").on("click", "button", function() {
     .attr("id")
     .replace("hour-", "");
 
-  // put values in temp object
-  tempObj = {
+  // put text value in appropriate object property
+  let tempObj = {
     hour: hourRow,
-    text: text
+    text: newText
   };
-  
-  // add temp object to events array being saved to localStorage 
-  events.push(tempObj);
-  
+
+  // get stored appointments to compare to new appt
+  appts = JSON.parse(localStorage.getItem("appts"));
+  // if no appointments saved, create empty array for appointments and add(push) new appt into it
+  if (!appts) {
+    appts = [];
+    appts.push(tempObj);
+  }
+  // if appoinments exist in localStorage, 
+  // find the index of the saved object whose hour value matches the hour of the new appt
+  else {
+    let index = appts.findIndex(function(appt) {
+      return JSON.stringify(tempObj.hour) === JSON.stringify(appt.hour);
+    });
+    // if index is not found (if there is not a saved object with a matching hour value),
+    //then check that there is a text input and if so, add the new appt to the appts array
+    if (index === -1) {
+      if (tempObj.text !== "") {
+        appts.push(tempObj);
+      }
+    }
+    // if the index is found (if there is a saved object with a matching hour value),
+    // then check that the text is different and if so, replace the object at that index with the new object
+    else {
+      let text = appts[index].text;
+      if (text !== newText) {
+        appts[index] = tempObj;
+      }
+    }
+  }
+      
   // save events
   saveEvents();
   
