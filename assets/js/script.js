@@ -25,6 +25,13 @@ for (let i = 9; i <= 17; i++) {
   hourRowEl.append(hourEl, textEl, saveEl);
 }
 
+// create notification container to show when an appointment is saved
+let notifyContainer = $("#notify");
+let saveNotify = $("<p>")
+  .html("Appointment Added to <span class='red-text'>localStorage </span><i class='fa-solid fa-check'></i>");
+notifyContainer.append(saveNotify);
+notifyContainer.hide();
+
 // load appointments from localStorage
 let loadEvents = function() {
   appts = JSON.parse(localStorage.getItem("appts"));
@@ -44,15 +51,20 @@ let loadEvents = function() {
   }
 }
 
-// save appointments to local storage
+// save appointments
 let saveEvents = function() {
+  // save appointments to localStorage
   localStorage.setItem("appts", JSON.stringify(appts));
+
+  // show notification of appointments being saved
+  notifyContainer.show();
+  clearNotify();
 }
 
-// hide notification of appointment saved
+// hide notification of appointment saved after 2 seconds
 let clearNotify = function() {
   setTimeout(function() {
-    $("#notify").hide();
+    notifyContainer.hide();
   }, 2000);
 }
 
@@ -81,6 +93,7 @@ $(".time-block").on("click", "button", function() {
   if (!appts) {
     appts = [];
     appts.push(tempObj);
+    saveEvents();
   }
   // if appoinments exist in localStorage, 
   // find the index of the saved object whose hour value matches the hour of the new appt
@@ -93,6 +106,7 @@ $(".time-block").on("click", "button", function() {
     if (index === -1) {
       if (tempObj.text !== "") {
         appts.push(tempObj);
+        saveEvents();
       }
     }
     // if the index is found (if there is a saved object with a matching hour value),
@@ -101,21 +115,10 @@ $(".time-block").on("click", "button", function() {
       let text = appts[index].text;
       if (text !== newText) {
         appts[index] = tempObj;
+        saveEvents();
       }
     }
   }
-      
-  // save events
-  saveEvents();
-  
-  // show then hide notification of appointments being saved
-  let notifyContainer = $("#notify");
-  
-  let saveNotify = $("<p>")
-    .html("Appointment Added to <span class='red-text'>localStorage </span><i class='fa-solid fa-check'></i>");
-  
-  notifyContainer.append(saveNotify);
-  clearNotify();
 })
 
 // check time and compare to time-blocks, add classes to change color based on time
