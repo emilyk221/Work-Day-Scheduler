@@ -73,7 +73,8 @@ $(".time-block").on("click", "button", function() {
   // get value of text from textarea
   let newText = $(this)
     .prev("textarea")
-    .val();
+    .val()
+    .trim();
 
   // get the hour/time from the time-block row id
   let hourRow = $(this)
